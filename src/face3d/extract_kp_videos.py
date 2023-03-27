@@ -12,8 +12,8 @@ from itertools import cycle
 from torch.multiprocessing import Pool, Process, set_start_method
 
 class KeypointExtractor():
-    def __init__(self):
-        self.detector = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D)   
+    def __init__(self, device):
+        self.detector = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, device=device)   
 
     def extract_keypoint(self, images, name=None, info=True):
         if isinstance(images, list):
@@ -71,7 +71,7 @@ def read_video(filename):
 def run(data):
     filename, opt, device = data
     os.environ['CUDA_VISIBLE_DEVICES'] = device
-    kp_extractor = KeypointExtractor()
+    kp_extractor = KeypointExtractor(device)
     images = read_video(filename)
     name = filename.split('/')[-2:]
     os.makedirs(os.path.join(opt.output_dir, name[-2]), exist_ok=True)
