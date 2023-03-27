@@ -32,3 +32,8 @@ saved_model/**/* filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.zst filter=lfs diff=lfs merge=lfs -text
 *tfevents* filter=lfs diff=lfs merge=lfs -text
+checkpoints/BFM_Fitting/01_MorphableModel.mat filter=lfs diff=lfs merge=lfs -text
+checkpoints/BFM_Fitting/BFM09_model_info.mat filter=lfs diff=lfs merge=lfs -text
+checkpoints/facevid2vid_00189-model.pth.tar filter=lfs diff=lfs merge=lfs -text
+checkpoints/mapping_00229-model.pth.tar filter=lfs diff=lfs merge=lfs -text
+checkpoints/shape_predictor_68_face_landmarks.dat filter=lfs diff=lfs merge=lfs -text
