@@ -18,7 +18,7 @@ class SadTalker():
             device = "cuda"
         else:
             device = "cpu"
-
+        
         current_code_path = sys.argv[0]
         modules_path = os.path.split(current_code_path)[0]
 
@@ -53,7 +53,7 @@ class SadTalker():
                                             facerender_yaml_path, device)
         self.device = device
 
-    def test(self, source_image, driven_audio, result_dir):
+    def test(self, source_image, driven_audio, still_mode, use_enhancer, result_dir):
 
         time_tag = strftime("%Y_%m_%d_%H.%M.%S")
         save_dir = os.path.join(result_dir, time_tag)
@@ -87,9 +87,14 @@ class SadTalker():
         coeff_path = self.audio_to_coeff.generate(batch, save_dir, pose_style)
         #coeff2video
         batch_size = 4
-        data = get_facerender_data(coeff_path, crop_pic_path, first_coeff_path, audio_path, batch_size)
-        self.animate_from_coeff.generate(data, save_dir)
+        data = get_facerender_data(coeff_path, crop_pic_path, first_coeff_path, audio_path, batch_size, still_mode=still_mode)
+        self.animate_from_coeff.generate(data, save_dir, enhancer='gfpgan' if use_enhancer else None)
         video_name = data['video_name']
         print(f'The generated video is named {video_name} in {save_dir}')
-        return os.path.join(save_dir, video_name+'.mp4'), os.path.join(save_dir, video_name+'.mp4')
+        
+        if use_enhancer:
+            return os.path.join(save_dir, video_name+'_enhanced.mp4'), os.path.join(save_dir, video_name+'_enhanced.mp4')
+
+        else:
+            return os.path.join(save_dir, video_name+'.mp4'), os.path.join(save_dir, video_name+'.mp4')
     
