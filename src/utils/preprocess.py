@@ -43,7 +43,7 @@ class CropAndExtract():
     def __init__(self, path_of_lm_croper, path_of_net_recon_model, dir_of_BFM_fitting, device):
 
         self.croper = Croper(path_of_lm_croper)
-        self.kp_extractor = KeypointExtractor()
+        self.kp_extractor = KeypointExtractor(device)
         self.net_recon = networks.define_net_recon(net_recon='resnet50', use_last_fc=False, init_path='').to(device)
         checkpoint = torch.load(path_of_net_recon_model, map_location=torch.device(device))    
         self.net_recon.load_state_dict(checkpoint['net_recon'])
