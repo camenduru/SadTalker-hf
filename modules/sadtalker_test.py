@@ -53,7 +53,7 @@ class SadTalker():
                                             facerender_yaml_path, device)
         self.device = device
 
-    def test(self, source_image, driven_audio, still_mode, use_enhancer, result_dir):
+    def test(self, source_image, driven_audio, still_mode, use_enhancer, result_dir='./'):
 
         time_tag = strftime("%Y_%m_%d_%H.%M.%S")
         save_dir = os.path.join(result_dir, time_tag)
