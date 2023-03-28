@@ -65,7 +65,7 @@ def get_data(first_coeff_path, audio_path, device):
 
     if '.mp3' in audio_path:
         new_audio = audio_path.replace('.mp3', '.wav')
-        command = 'ffmpeg -i '+ audio_path + ' -acodec pcm_s16le -ac 1 -ar 16000 ' + new_audio
+        command = 'ffmpeg -i '+ audio_path + ' ' + new_audio
         subprocess.call(command, shell=platform.system() != 'Windows')
     else:
         new_audio = audio_path
