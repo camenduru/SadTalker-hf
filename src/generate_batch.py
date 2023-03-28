@@ -71,6 +71,7 @@ def get_data(first_coeff_path, audio_path, device):
     source_semantics_dict = scio.loadmat(source_semantics_path)
     ref_coeff = source_semantics_dict['coeff_3dmm'][:1,:70]         #1 70
 
+    print(audio_path)
     if '.mp3' in audio_path:
         print(audio_path)
         mp3_to_wav(audio_path, audio_path.replace('.mp3','.wav'), 16000)
