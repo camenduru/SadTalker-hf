@@ -1,6 +1,6 @@
 ---
 title: SadTalker
-emoji: 🐨
+emoji: 🔮
 colorFrom: purple
 colorTo: green
 sdk: gradio
