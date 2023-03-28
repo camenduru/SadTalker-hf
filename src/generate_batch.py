@@ -6,6 +6,14 @@ import scipy.io as scio
 import src.utils.audio as audio
 import subprocess, platform
 
+from pydub import AudioSegment
+
+def mp3_to_wav(mp3_filename,wav_filename,frame_rate):
+    mp3_file = AudioSegment.from_mp3(file=mp3_filename)
+    mp3_file.set_frame_rate(frame_rate).export(wav_filename,format="wav")
+
+
+
 def crop_pad_audio(wav, audio_length):
     if len(wav) > audio_length:
         wav = wav[:audio_length]
@@ -64,9 +72,9 @@ def get_data(first_coeff_path, audio_path, device):
     ref_coeff = source_semantics_dict['coeff_3dmm'][:1,:70]         #1 70
 
     if '.mp3' in audio_path:
-        new_audio = audio_path.replace('.mp3', '.wav')
-        command = 'ffmpeg -i '+ audio_path + ' ' + new_audio
-        subprocess.call(command, shell=platform.system() != 'Windows')
+        print(audio_path)
+        mp3_to_wav(audio_path, audio_path.replace('.mp3','.wav'), 16000)
+        new_audio = audio_path.replace('.mp3','.wav')
     else:
         new_audio = audio_path
 
