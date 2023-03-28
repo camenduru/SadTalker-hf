@@ -2,7 +2,6 @@ import os, sys
 import tempfile
 import gradio as gr
 from modules.text2speech import text2speech 
-from modules.gfpgan_inference import gfpgan
 from modules.sadtalker_test import SadTalker  
 
 def get_driven_audio(audio):  
@@ -61,12 +60,6 @@ def sadtalker_demo(result_dir='./'):
                 [
                     'examples/source_image/art_10.png',
                     'examples/driven_audio/deyu.wav',
-                    True,
-                    False
-                ],
-                [
-                    'examples/source_image/art_1.png',
-                    'examples/driven_audio/chinese_poem1.wav',
                     True,
                     False
                 ],
