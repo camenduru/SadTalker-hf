@@ -62,19 +62,7 @@ def sadtalker_demo(result_dir='/tmp/'):
                     'examples/driven_audio/deyu.wav',
                     True,
                     False
-                ],
-                [
-                    'examples/source_image/art_13.png',
-                    'examples/driven_audio/fayu.wav',
-                    True,
-                    False
-                ],
-                [
-                    'examples/source_image/art_5.png',
-                    'examples/driven_audio/chinese_news.wav',
-                    True,
-                    False
-                ],
+                ]
             ]
             gr.Examples(examples=examples,
                         inputs=[
