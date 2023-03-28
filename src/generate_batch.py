@@ -70,7 +70,7 @@ def get_data(first_coeff_path, audio_path, device):
     else:
         new_audio = audio_path
 
-    wav = audio.load_wav(audio_path, 16000) 
+    wav = audio.load_wav(new_audio, 16000) 
             
     wav_length, num_frames = parse_audio_length(len(wav), 16000, 25)
     wav = crop_pad_audio(wav, wav_length)
