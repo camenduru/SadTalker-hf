@@ -92,6 +92,9 @@ class SadTalker():
         video_name = data['video_name']
         print(f'The generated video is named {video_name} in {save_dir}')
         
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+        
         if use_enhancer:
             return os.path.join(save_dir, video_name+'_enhanced.mp4'), os.path.join(save_dir, video_name+'_enhanced.mp4')
 
