@@ -35,17 +35,15 @@ def sadtalker_demo(result_dir='./tmp/'):
                             source_image = gr.Image(label="Source image", source="upload", type="filepath").style(height=256,width=256)
  
                 with gr.Tabs(elem_id="sadtalker_driven_audio"):
-                    with gr.TabItem('Upload audio'):
+                    with gr.TabItem('Upload audio(wav only currently)'):
                         with gr.Column(variant='panel'):
                             driven_audio = gr.Audio(label="Input audio", source="upload", type="filepath")
-                            # submit_audio_1 = gr.Button('Submit', variant='primary')
-                        # submit_audio_1.click(fn=get_driven_audio, inputs=input_audio1, outputs=driven_audio)
 
             with gr.Column(variant='panel'): 
                 with gr.Tabs(elem_id="sadtalker_checkbox"):
                     with gr.TabItem('Settings'):
                         with gr.Column(variant='panel'):
-                            is_still_mode = gr.Checkbox(label="w/ Still Mode (fewer hand motion)")
+                            is_still_mode = gr.Checkbox(label="w/ Still Mode (fewer head motion)")
                             enhancer = gr.Checkbox(label="w/ GFPGAN as Face enhancer")
                             submit = gr.Button('Generate', elem_id="sadtalker_generate", variant='primary')
 
@@ -72,11 +70,6 @@ def sadtalker_demo(result_dir='./tmp/'):
                         outputs=[gen_video, gen_text],
                         fn=sad_talker.test,
                         cache_examples=os.getenv('SYSTEM') == 'spaces')
-
-            
-
-
-        
 
         submit.click(
                     fn=sad_talker.test, 
