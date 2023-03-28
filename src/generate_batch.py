@@ -62,7 +62,15 @@ def get_data(first_coeff_path, audio_path, device):
     source_semantics_dict = scio.loadmat(source_semantics_path)
     ref_coeff = source_semantics_dict['coeff_3dmm'][:1,:70]         #1 70
 
+    if '.mp3' in audio_path:
+        new_audio = audio_path.replace('.mp3', '.wav')
+        command = 'ffmpeg -i '+ audio_path + ' -acodec pcm_s16le -ac 1 -ar 16000 ' + new_audio
+        subprocess.call(command, shell=platform.system() != 'Windows')
+    else:
+        new_audio = audio_path
+
     wav = audio.load_wav(audio_path, 16000) 
+            
     wav_length, num_frames = parse_audio_length(len(wav), 16000, 25)
     wav = crop_pad_audio(wav, wav_length)
     orig_mel = audio.melspectrogram(wav).T
