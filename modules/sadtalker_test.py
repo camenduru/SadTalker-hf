@@ -8,6 +8,12 @@ from src.facerender.animate import AnimateFromCoeff
 from src.generate_batch import get_data
 from src.generate_facerender_batch import get_facerender_data
 
+from pydub import AudioSegment
+
+def mp3_to_wav(mp3_filename,wav_filename,frame_rate):
+    mp3_file = AudioSegment.from_file(file=mp3_filename)
+    mp3_file.set_frame_rate(frame_rate).export(wav_filename,format="wav")
+
 from modules.text2speech import text2speech
 
 class SadTalker():
@@ -68,7 +74,13 @@ class SadTalker():
 
         if os.path.isfile(driven_audio):
             audio_path = os.path.join(input_dir, os.path.basename(driven_audio))  
-            shutil.move(driven_audio, input_dir)
+
+            #### mp3 to wav
+            if '.mp3' in audio_path:
+                mp3_to_wav(driven_audio, audio_path.replace('.mp3', '.wav'), 16000)
+                audio_path = audio_path.replace('.mp3', '.wav')
+            else:
+                shutil.move(driven_audio, input_dir)
         else:
             text2speech
 
@@ -86,12 +98,12 @@ class SadTalker():
         batch = get_data(first_coeff_path, audio_path, self.device)
         coeff_path = self.audio_to_coeff.generate(batch, save_dir, pose_style)
         #coeff2video
-        batch_size = 8
+        batch_size = 4
         data = get_facerender_data(coeff_path, crop_pic_path, first_coeff_path, audio_path, batch_size, still_mode=still_mode)
         self.animate_from_coeff.generate(data, save_dir, enhancer='gfpgan' if use_enhancer else None)
         video_name = data['video_name']
         print(f'The generated video is named {video_name} in {save_dir}')
-        
+
         torch.cuda.empty_cache()
         torch.cuda.synchronize()
         
@@ -100,4 +112,6 @@ class SadTalker():
 
         else:
             return os.path.join(save_dir, video_name+'.mp4'), os.path.join(save_dir, video_name+'.mp4')
+        
+
     
