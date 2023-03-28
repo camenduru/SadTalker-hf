@@ -40,20 +40,6 @@ def sadtalker_demo(result_dir='./tmp/'):
                             driven_audio = gr.Audio(label="Input audio", source="upload", type="filepath")
                             # submit_audio_1 = gr.Button('Submit', variant='primary')
                         # submit_audio_1.click(fn=get_driven_audio, inputs=input_audio1, outputs=driven_audio)
-                
-
-            with gr.Column(variant='panel'): 
-                with gr.Tabs(elem_id="sadtalker_checkbox"):
-                    with gr.TabItem('Settings'):
-                        with gr.Column(variant='panel'):
-                            is_still_mode = gr.Checkbox(label="w/ Still Mode (fewer hand motion)")
-                            enhancer = gr.Checkbox(label="w/ GFPGAN as Face enhancer")
-                            submit = gr.Button('Generate', elem_id="sadtalker_generate", variant='primary')
-
-                with gr.Tabs(elem_id="sadtalker_genearted"):
-                        gen_video = gr.Video(label="Generated video", format="mp4").style(height=256,width=256)
-                        gen_text = gr.Textbox(visible=False)
-
 
         with gr.Row():
             examples = [
@@ -74,6 +60,21 @@ def sadtalker_demo(result_dir='./tmp/'):
                         outputs=[gen_video, gen_text],
                         fn=sad_talker.test,
                         cache_examples=os.getenv('SYSTEM') == 'spaces')
+
+            with gr.Column(variant='panel'): 
+                with gr.Tabs(elem_id="sadtalker_checkbox"):
+                    with gr.TabItem('Settings'):
+                        with gr.Column(variant='panel'):
+                            is_still_mode = gr.Checkbox(label="w/ Still Mode (fewer hand motion)")
+                            enhancer = gr.Checkbox(label="w/ GFPGAN as Face enhancer")
+                            submit = gr.Button('Generate', elem_id="sadtalker_generate", variant='primary')
+
+                with gr.Tabs(elem_id="sadtalker_genearted"):
+                        gen_video = gr.Video(label="Generated video", format="mp4").style(height=256,width=256)
+                        gen_text = gr.Textbox(visible=False)
+
+
+        
 
         submit.click(
                     fn=sad_talker.test, 
