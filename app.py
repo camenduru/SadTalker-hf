@@ -90,10 +90,8 @@ def sadtalker_demo(result_dir='./tmp/'):
 
 if __name__ == "__main__":
 
-    current_code_path = sys.argv[0]
-    current_root_dir = os.path.split(current_code_path)[0] 
-    sadtalker_result_dir = os.path.join(current_root_dir, 'results', 'sadtalker')
+    sadtalker_result_dir = os.path.join('./', 'results')
     demo = sadtalker_demo(sadtalker_result_dir)
-    demo.launch(file_directories="/root/cache")
+    demo.launch()
 
 
