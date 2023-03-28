@@ -19,7 +19,7 @@ def get_driven_audio(audio):
 def get_source_image(image):   
         return image
 
-def sadtalker_demo(result_dir):
+def sadtalker_demo(result_dir='./'):
 
     sad_talker = SadTalker()
     with gr.Blocks(analytics_enabled=False) as sadtalker_interface:
