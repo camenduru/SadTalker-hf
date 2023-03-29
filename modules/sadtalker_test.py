@@ -1,7 +1,5 @@
 import torch
-from time import gmtime, strftime
 import os, sys, shutil
-from argparse import ArgumentParser
 from src.utils.preprocess import CropAndExtract
 from src.test_audio2coeff import Audio2Coeff  
 from src.facerender.animate import AnimateFromCoeff
@@ -91,7 +89,7 @@ class SadTalker():
         #crop image and extract 3dmm from image
         first_frame_dir = os.path.join(save_dir, 'first_frame_dir')
         os.makedirs(first_frame_dir, exist_ok=True)
-        first_coeff_path, crop_pic_path, original_size = self.preprocess_model.generate(pic_path, first_frame_dir, crop_or_resize= 'crop' if resize_mode == 'crop' else 'resize')
+        first_coeff_path, crop_pic_path, original_size = self.preprocess_model.generate(pic_path, first_frame_dir, crop_or_resize= 'crop' if resize_mode else 'resize')
         if first_coeff_path is None:
             raise AttributeError("No face is detected")
 
