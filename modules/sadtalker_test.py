@@ -106,6 +106,7 @@ class SadTalker():
 
         torch.cuda.empty_cache()
         torch.cuda.synchronize()
+        import gc; gc.collect() 
         
         if use_enhancer:
             return os.path.join(save_dir, video_name+'_enhanced.mp4'), os.path.join(save_dir, video_name+'_enhanced.mp4')
