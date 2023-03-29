@@ -27,15 +27,15 @@ def sadtalker_demo(result_dir='./tmp/'):
                     <a style='font-size:18px;color: #efefef' href='https://sadtalker.github.io'>Homepage</a>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \
                      <a style='font-size:18px;color: #efefef' href='https://github.com/Winfredy/SadTalker'> Github </div>")
         
-        with gr.Row().style(equal_height=False):
+        with gr.Row():
             with gr.Column(variant='panel'):
                 with gr.Tabs(elem_id="sadtalker_source_image"):
                     with gr.TabItem('Upload image'):
                         with gr.Row():
-                            source_image = gr.Image(label="Source image", source="upload", type="filepath").style(height=256,width=256)
+                            source_image = gr.Image(label="Source image", source="upload", type="filepath").style(height=256)
  
                 with gr.Tabs(elem_id="sadtalker_driven_audio"):
-                    with gr.TabItem('Upload audio(wav only currently)'):
+                    with gr.TabItem('Upload audio(wav/mp3 only currently)'):
                         with gr.Column(variant='panel'):
                             driven_audio = gr.Audio(label="Input audio", source="upload", type="filepath")
 
@@ -43,12 +43,13 @@ def sadtalker_demo(result_dir='./tmp/'):
                 with gr.Tabs(elem_id="sadtalker_checkbox"):
                     with gr.TabItem('Settings'):
                         with gr.Column(variant='panel'):
-                            is_still_mode = gr.Checkbox(label="w/ Still Mode (fewer head motion)")
-                            enhancer = gr.Checkbox(label="w/ GFPGAN as Face enhancer")
+                            is_still_mode = gr.Checkbox(label="Still Mode (fewer head motion)").style(container=True)
+                            is_resize_mode = gr.Checkbox(label="Resize Mode (⚠️ Resize mode need manually crop the image firstly, can handle larger image crop)").style(container=True)
+                            is_enhance_mode = gr.Checkbox(label="Enhance Mode (better face quality )").style(container=True)
                             submit = gr.Button('Generate', elem_id="sadtalker_generate", variant='primary')
 
                 with gr.Tabs(elem_id="sadtalker_genearted"):
-                        gen_video = gr.Video(label="Generated video", format="mp4").style(height=256,width=256)
+                        gen_video = gr.Video(label="Generated video", format="mp4").style(width=256)
                         gen_text = gr.Textbox(visible=False)
                     
         with gr.Row():
@@ -57,7 +58,22 @@ def sadtalker_demo(result_dir='./tmp/'):
                     'examples/source_image/art_10.png',
                     'examples/driven_audio/deyu.wav',
                     True,
+                    False,
                     False
+                ],
+                [
+                    'examples/source_image/art_1.png',
+                    'examples/driven_audio/fayu.wav',
+                    True,
+                    True,
+                    False
+                ],
+                [
+                    'examples/source_image/art_9.png',
+                    'examples/driven_audio/itosinger1.wav',
+                    True,
+                    False,
+                    True
                 ]
             ]
             gr.Examples(examples=examples,
@@ -65,7 +81,8 @@ def sadtalker_demo(result_dir='./tmp/'):
                             source_image,
                             driven_audio,
                             is_still_mode,
-                            enhancer,
+                            is_resize_mode,
+                            is_enhance_mode,
                             gr.Textbox(value=result_dir, visible=False)], 
                         outputs=[gen_video, gen_text],
                         fn=sad_talker.test,
@@ -76,7 +93,8 @@ def sadtalker_demo(result_dir='./tmp/'):
                     inputs=[source_image,
                             driven_audio,
                             is_still_mode,
-                            enhancer,
+                            is_resize_mode,
+                            is_enhance_mode,
                             gr.Textbox(value=result_dir, visible=False)], 
                     outputs=[gen_video, gen_text]
                     )

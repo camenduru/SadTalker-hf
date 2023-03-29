@@ -1,13 +1,12 @@
-import torch
+import torch, uuid
 from time import gmtime, strftime
 import os, sys, shutil
-from argparse import ArgumentParser
 from src.utils.preprocess import CropAndExtract
 from src.test_audio2coeff import Audio2Coeff  
 from src.facerender.animate import AnimateFromCoeff
 from src.generate_batch import get_data
 from src.generate_facerender_batch import get_facerender_data
-import uuid
+from src.utils.text2speech import text2speech
 
 from pydub import AudioSegment
 
@@ -15,38 +14,32 @@ def mp3_to_wav(mp3_filename,wav_filename,frame_rate):
     mp3_file = AudioSegment.from_file(file=mp3_filename)
     mp3_file.set_frame_rate(frame_rate).export(wav_filename,format="wav")
 
-from modules.text2speech import text2speech
 
 class SadTalker():
 
-    def __init__(self, checkpoint_path='checkpoints'):
+    def __init__(self, checkpoint_path='checkpoints', config_path='src/config'):
 
         if torch.cuda.is_available() :
             device = "cuda"
         else:
             device = "cpu"
         
-        # current_code_path = sys.argv[0]
-        # modules_path = os.path.split(current_code_path)[0]
+        os.environ['TORCH_HOME']= checkpoint_path
 
-        current_root_path = './'
+        path_of_lm_croper = os.path.join( checkpoint_path, 'shape_predictor_68_face_landmarks.dat')
+        path_of_net_recon_model = os.path.join( checkpoint_path, 'epoch_20.pth')
+        dir_of_BFM_fitting = os.path.join( checkpoint_path, 'BFM_Fitting')
+        wav2lip_checkpoint = os.path.join( checkpoint_path, 'wav2lip.pth')
 
-        os.environ['TORCH_HOME']=os.path.join(current_root_path, 'checkpoints')
-
-        path_of_lm_croper = os.path.join(current_root_path, 'checkpoints', 'shape_predictor_68_face_landmarks.dat')
-        path_of_net_recon_model = os.path.join(current_root_path, 'checkpoints', 'epoch_20.pth')
-        dir_of_BFM_fitting = os.path.join(current_root_path, 'checkpoints', 'BFM_Fitting')
-        wav2lip_checkpoint = os.path.join(current_root_path, 'checkpoints', 'wav2lip.pth')
-
-        audio2pose_checkpoint = os.path.join(current_root_path, 'checkpoints', 'auido2pose_00140-model.pth')
-        audio2pose_yaml_path = os.path.join(current_root_path, 'config', 'auido2pose.yaml')
+        audio2pose_checkpoint = os.path.join( checkpoint_path, 'auido2pose_00140-model.pth')
+        audio2pose_yaml_path = os.path.join( config_path, 'auido2pose.yaml')
     
-        audio2exp_checkpoint = os.path.join(current_root_path, 'checkpoints', 'auido2exp_00300-model.pth')
-        audio2exp_yaml_path = os.path.join(current_root_path, 'config', 'auido2exp.yaml')
+        audio2exp_checkpoint = os.path.join( checkpoint_path, 'auido2exp_00300-model.pth')
+        audio2exp_yaml_path = os.path.join( config_path, 'auido2exp.yaml')
 
-        free_view_checkpoint = os.path.join(current_root_path, 'checkpoints', 'facevid2vid_00189-model.pth.tar')
-        mapping_checkpoint = os.path.join(current_root_path, 'checkpoints', 'mapping_00229-model.pth.tar')
-        facerender_yaml_path = os.path.join(current_root_path, 'config', 'facerender.yaml')
+        free_view_checkpoint = os.path.join( checkpoint_path, 'facevid2vid_00189-model.pth.tar')
+        mapping_checkpoint = os.path.join( checkpoint_path, 'mapping_00229-model.pth.tar')
+        facerender_yaml_path = os.path.join( config_path, 'facerender.yaml')
 
         #init model
         print(path_of_lm_croper)
@@ -60,9 +53,9 @@ class SadTalker():
                                             facerender_yaml_path, device)
         self.device = device
 
-    def test(self, source_image, driven_audio, still_mode, resize_mode, use_enhancer, result_dir='./'):
+    def test(self, source_image, driven_audio, still_mode, use_enhancer, result_dir='./'):
 
-        time_tag =  str(uuid.uuid4()) # strftime("%Y_%m_%d_%H.%M.%S")
+        time_tag = str(uuid.uuid4())
         save_dir = os.path.join(result_dir, time_tag)
         os.makedirs(save_dir, exist_ok=True)
 
@@ -91,12 +84,13 @@ class SadTalker():
         #crop image and extract 3dmm from image
         first_frame_dir = os.path.join(save_dir, 'first_frame_dir')
         os.makedirs(first_frame_dir, exist_ok=True)
-        first_coeff_path, crop_pic_path, original_size = self.preprocess_model.generate(pic_path, first_frame_dir, crop_or_resize= 'crop' if resize_mode == 'crop' else 'resize')
+        first_coeff_path, crop_pic_path, original_size = self.preprocess_model.generate(pic_path, first_frame_dir)
+        
         if first_coeff_path is None:
             raise AttributeError("No face is detected")
 
         #audio2ceoff
-        batch = get_data(first_coeff_path, audio_path, self.device)
+        batch = get_data(first_coeff_path, audio_path, self.device) # longer audio?
         coeff_path = self.audio_to_coeff.generate(batch, save_dir, pose_style)
         #coeff2video
         batch_size = 4
@@ -107,8 +101,7 @@ class SadTalker():
 
         torch.cuda.empty_cache()
         torch.cuda.synchronize()
-        
-        import gc; gc.collect() 
+        import gc; gc.collect()
         
         if use_enhancer:
             return os.path.join(save_dir, video_name+'_enhanced.mp4'), os.path.join(save_dir, video_name+'_enhanced.mp4')
