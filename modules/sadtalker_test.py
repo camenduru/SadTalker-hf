@@ -7,6 +7,7 @@ from src.test_audio2coeff import Audio2Coeff
 from src.facerender.animate import AnimateFromCoeff
 from src.generate_batch import get_data
 from src.generate_facerender_batch import get_facerender_data
+import uuid
 
 from pydub import AudioSegment
 
@@ -25,8 +26,8 @@ class SadTalker():
         else:
             device = "cpu"
         
-        current_code_path = sys.argv[0]
-        modules_path = os.path.split(current_code_path)[0]
+        # current_code_path = sys.argv[0]
+        # modules_path = os.path.split(current_code_path)[0]
 
         current_root_path = './'
 
@@ -61,7 +62,7 @@ class SadTalker():
 
     def test(self, source_image, driven_audio, still_mode, use_enhancer, result_dir='./'):
 
-        time_tag = strftime("%Y_%m_%d_%H.%M.%S")
+        time_tag =  str(uuid.uuid4()) # strftime("%Y_%m_%d_%H.%M.%S")
         save_dir = os.path.join(result_dir, time_tag)
         os.makedirs(save_dir, exist_ok=True)
 
@@ -106,6 +107,7 @@ class SadTalker():
 
         torch.cuda.empty_cache()
         torch.cuda.synchronize()
+        
         import gc; gc.collect() 
         
         if use_enhancer:
