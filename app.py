@@ -27,7 +27,7 @@ def sadtalker_demo(result_dir='./tmp/'):
                     <a style='font-size:18px;color: #efefef' href='https://sadtalker.github.io'>Homepage</a>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \
                      <a style='font-size:18px;color: #efefef' href='https://github.com/Winfredy/SadTalker'> Github </div>")
         
-        with gr.Row().style(equal_height=False):
+        with gr.Row():
             with gr.Column(variant='panel'):
                 with gr.Tabs(elem_id="sadtalker_source_image"):
                     with gr.TabItem('Upload image'):
@@ -35,7 +35,7 @@ def sadtalker_demo(result_dir='./tmp/'):
                             source_image = gr.Image(label="Source image", source="upload", type="filepath").style(height=256,width=256)
  
                 with gr.Tabs(elem_id="sadtalker_driven_audio"):
-                    with gr.TabItem('Upload audio(wav only currently)'):
+                    with gr.TabItem('Upload audio(wav/mp3 only currently)'):
                         with gr.Column(variant='panel'):
                             driven_audio = gr.Audio(label="Input audio", source="upload", type="filepath")
 
