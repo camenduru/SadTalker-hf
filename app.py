@@ -88,6 +88,6 @@ if __name__ == "__main__":
 
     sadtalker_result_dir = os.path.join('./', 'results')
     demo = sadtalker_demo(sadtalker_result_dir)
-    demo.launch(max_size=5)
+    demo.launch()
 
 
