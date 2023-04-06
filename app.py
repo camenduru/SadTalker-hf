@@ -28,9 +28,9 @@ def sadtalker_demo():
                             source_image = gr.Image(label="Source image", source="upload", type="filepath").style(height=256,width=256)
  
                 with gr.Tabs(elem_id="sadtalker_driven_audio"):
-                    with gr.TabItem('Upload OR TTS'):
+                    with gr.TabItem('Upload or Generating from TTS'):
                         with gr.Column(variant='panel'):
-                            driven_audio = gr.Audio(label="Input audio", source="upload", type="filepath")
+                            driven_audio = gr.Audio(label="Input audio(.wav/.mp3)", source="upload", type="filepath")
                     
                         with gr.Column(variant='panel'):
                             input_text = gr.Textbox(label="Generating audio from text", lines=5, placeholder="Alternatively, you can genreate the audio from text using @Coqui.ai TTS.")
