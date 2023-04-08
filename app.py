@@ -3,15 +3,20 @@ import tempfile
 import gradio as gr
 from src.gradio_demo import SadTalker  
 from src.utils.text2speech import TTSTalker
+from huggingface_hub import snapshot_download
 
 def get_source_image(image):   
         return image
 
-
+def download_model():
+    REPO_ID = 'vinthony/SadTalker'
+    snapshot_download(repo_id=REPO_ID, local_dir='./checkpoints', local_dir_use_symlinks=True)
 
 def sadtalker_demo():
 
-    sad_talker = SadTalker()
+    download_model()
+
+    sad_talker = SadTalker(lazy_load=True)
     tts_talker = TTSTalker()
 
     with gr.Blocks(analytics_enabled=False) as sadtalker_interface:
@@ -42,7 +47,8 @@ def sadtalker_demo():
                 with gr.Tabs(elem_id="sadtalker_checkbox"):
                     with gr.TabItem('Settings'):
                         with gr.Column(variant='panel'):
-                            is_still_mode = gr.Checkbox(label="w/ Still Mode (fewer hand motion, works on full body)")
+                            preprocess_type = gr.Radio(['crop','resize','full'], value='crop', label='preprocess', info="How to handle input image?")
+                            is_still_mode = gr.Checkbox(label="w/ Still Mode (fewer hand motion, works with preprocess `full`)")
                             enhancer = gr.Checkbox(label="w/ GFPGAN as Face enhancer")
                             submit = gr.Button('Generate', elem_id="sadtalker_generate", variant='primary')
 
@@ -54,42 +60,83 @@ def sadtalker_demo():
                 [
                     'examples/source_image/full_body_1.png',
                     'examples/driven_audio/bus_chinese.wav',
+                    'crop',
                     True,
                     False
                 ],
                 [
                     'examples/source_image/full_body_2.png',
-                    'examples/driven_audio/itosinger1.wav',
+                    'examples/driven_audio/japanese.wav',
+                    'crop',
+                    False,
+                    False
+                ],
+                [
+                    'examples/source_image/full3.png',
+                    'examples/driven_audio/deyu.wav',
+                    'crop',
+                    False,
+                    True
+                ],
+                [
+                    'examples/source_image/full4.jpeg',
+                    'examples/driven_audio/eluosi.wav',
+                    'full',
+                    False,
+                    True
+                ],
+                [
+                    'examples/source_image/full4.jpeg',
+                    'examples/driven_audio/imagine.wav',
+                    'full',
+                    True,
+                    True
+                ],
+                [
+                    'examples/source_image/full_body_1.png',
+                    'examples/driven_audio/bus_chinese.wav',
+                    'full',
                     True,
                     False
                 ],
                 [
                     'examples/source_image/art_13.png',
                     'examples/driven_audio/fayu.wav',
+                    'resize',
                     True,
                     False
                 ],
                 [
                     'examples/source_image/art_5.png',
                     'examples/driven_audio/chinese_news.wav',
-                    True,
+                    'resize',
+                    False,
                     False
+                ],
+                [
+                    'examples/source_image/art_5.png',
+                    'examples/driven_audio/RD_Radio31_000.wav',
+                    'resize',
+                    True,
+                    True
                 ],
             ]
             gr.Examples(examples=examples,
                         inputs=[
                             source_image,
                             driven_audio,
+                            preprocess_type,
                             is_still_mode,
                             enhancer], 
                         outputs=[gen_video],
                         fn=sad_talker.test,
-                        cache_examples=os.getenv('SYSTEM') == 'spaces')
+                        cache_examples=True) # os.getenv('SYSTEM') == 'spaces')
 
         submit.click(
                     fn=sad_talker.test, 
                     inputs=[source_image,
                             driven_audio,
+                            preprocess_type,
                             is_still_mode,
                             enhancer], 
                     outputs=[gen_video]

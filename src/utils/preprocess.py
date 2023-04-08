@@ -63,7 +63,7 @@ class CropAndExtract():
         #load input
         if not os.path.isfile(input_path):
             raise ValueError('input_path must be a valid path to video/image file')
-        elif input_path.split('.')[1] in ['jpg', 'png', 'jpeg']:
+        elif input_path.split('.')[-1] in ['jpg', 'png', 'jpeg']:
             # loader for first frame
             full_frames = [cv2.imread(input_path)]
             fps = 25
@@ -78,8 +78,10 @@ class CropAndExtract():
                     video_stream.release()
                     break 
                 full_frames.append(frame) 
-        x_full_frames = [cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  for frame in full_frames] 
 
+        x_full_frames= [cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  for frame in full_frames] 
+
+        #### crop images as the 
         if crop_or_resize.lower() == 'crop': # default crop
             x_full_frames, crop, quad = self.croper.crop(x_full_frames, xsize=pic_size)
             clx, cly, crx, cry = crop
@@ -87,9 +89,16 @@ class CropAndExtract():
             lx, ly, rx, ry = int(lx), int(ly), int(rx), int(ry)
             oy1, oy2, ox1, ox2 = cly+ly, cly+ry, clx+lx, clx+rx
             crop_info = ((ox2 - ox1, oy2 - oy1), crop, quad)
-        else:
+        elif crop_or_resize.lower() == 'full':
+            x_full_frames, crop, quad = self.croper.crop(x_full_frames, still=True, xsize=pic_size)
+            clx, cly, crx, cry = crop
+            lx, ly, rx, ry = quad
+            lx, ly, rx, ry = int(lx), int(ly), int(rx), int(ry)
+            oy1, oy2, ox1, ox2 = cly+ly, cly+ry, clx+lx, clx+rx
+            crop_info = ((ox2 - ox1, oy2 - oy1), crop, quad)
+        else: # resize mode
             oy1, oy2, ox1, ox2 = 0, x_full_frames[0].shape[0], 0, x_full_frames[0].shape[1] 
-            crop_info = ((ox2 - ox1, oy2 - oy1))
+            crop_info = ((ox2 - ox1, oy2 - oy1), None, None)
 
         frames_pil = [Image.fromarray(cv2.resize(frame,(pic_size, pic_size))) for frame in x_full_frames]
         if len(frames_pil) == 0:
@@ -128,7 +137,7 @@ class CropAndExtract():
  
                 trans_params = np.array([float(item) for item in np.hsplit(trans_params, 5)]).astype(np.float32)
                 im_t = torch.tensor(np.array(im1)/255., dtype=torch.float32).permute(2, 0, 1).to(self.device).unsqueeze(0)
-            
+                
                 with torch.no_grad():
                     full_coeff = self.net_recon(im_t)
                     coeffs = split_coeff(full_coeff)

@@ -153,3 +153,7 @@ dmypy.json
 cython_debug/
 
 results/
+checkpoints/
+gradio_cached_examples/
+gfpgan/
+start.sh

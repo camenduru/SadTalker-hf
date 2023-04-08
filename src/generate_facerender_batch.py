@@ -7,7 +7,7 @@ import scipy.io as scio
 
 def get_facerender_data(coeff_path, pic_path, first_coeff_path, audio_path, 
                         batch_size, input_yaw_list=None, input_pitch_list=None, input_roll_list=None, 
-                        expression_scale=1.0, still_mode = False):
+                        expression_scale=1.0, still_mode = False, preprocess='crop'):
 
     semantic_radius = 13
     video_name = os.path.splitext(os.path.split(coeff_path)[-1])[0]
@@ -25,7 +25,12 @@ def get_facerender_data(coeff_path, pic_path, first_coeff_path, audio_path,
     data['source_image'] = source_image_ts
  
     source_semantics_dict = scio.loadmat(first_coeff_path)
-    source_semantics = source_semantics_dict['coeff_3dmm'][:1,:70]         #1 70
+
+    if preprocess.lower() != 'full':
+        source_semantics = source_semantics_dict['coeff_3dmm'][:1,:70]         #1 70
+    else:
+        source_semantics = source_semantics_dict['coeff_3dmm'][:1,:73]         #1 70
+
     source_semantics_new = transform_semantic_1(source_semantics, semantic_radius)
     source_semantics_ts = torch.FloatTensor(source_semantics_new).unsqueeze(0)
     source_semantics_ts = source_semantics_ts.repeat(batch_size, 1, 1)
@@ -35,6 +40,9 @@ def get_facerender_data(coeff_path, pic_path, first_coeff_path, audio_path,
     generated_dict = scio.loadmat(coeff_path)
     generated_3dmm = generated_dict['coeff_3dmm']
     generated_3dmm[:, :64] = generated_3dmm[:, :64] * expression_scale
+
+    if preprocess.lower() == 'full':
+        generated_3dmm = np.concatenate([generated_3dmm, np.repeat(source_semantics[:,70:], generated_3dmm.shape[0], axis=0)], axis=1)
 
     if still_mode:
         generated_3dmm[:, 64:] = np.repeat(source_semantics[:, 64:], generated_3dmm.shape[0], axis=0)
@@ -82,7 +90,7 @@ def transform_semantic_1(semantic, semantic_radius):
 
 def transform_semantic_target(coeff_3dmm, frame_index, semantic_radius):
     num_frames = coeff_3dmm.shape[0]
-    seq = list(range(frame_index- semantic_radius, frame_index+ semantic_radius+1))
+    seq = list(range(frame_index- semantic_radius, frame_index + semantic_radius+1))
     index = [ min(max(item, 0), num_frames-1) for item in seq ] 
     coeff_3dmm_g = coeff_3dmm[index, :]
     return coeff_3dmm_g.transpose(1,0)
@@ -124,8 +132,3 @@ def gen_camera_pose(camera_degree_list, frame_num, batch_size):
     new_degree_np = np.array(new_degree_list).reshape(batch_size, -1) 
     return new_degree_np
     
-
-
-
-
-
