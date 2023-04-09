@@ -130,7 +130,7 @@ def sadtalker_demo():
                             enhancer], 
                         outputs=[gen_video],
                         fn=sad_talker.test,
-                        cache_examples=True) # os.getenv('SYSTEM') == 'spaces')
+                        cache_examples=False) # os.getenv('SYSTEM') == 'spaces')
 
         submit.click(
                     fn=sad_talker.test, 
