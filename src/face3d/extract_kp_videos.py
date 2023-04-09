@@ -40,6 +40,7 @@ class KeypointExtractor():
                     break
                 except RuntimeError as e:
                     if str(e).startswith('CUDA'):
+                        print(e)
                         print("Warning: out of memory, sleep for 1s")
                         time.sleep(1)
                     else:
