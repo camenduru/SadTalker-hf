@@ -42,8 +42,6 @@ class SadTalker():
 
         self.free_view_checkpoint = os.path.join( checkpoint_path, 'facevid2vid_00189-model.pth.tar')
 
-       
-        
         self.lazy_load = lazy_load
 
         if not self.lazy_load:
@@ -75,6 +73,7 @@ class SadTalker():
             self.mapping_checkpoint = os.path.join(self.checkpoint_path, 'mapping_00229-model.pth.tar')
             self.facerender_yaml_path = os.path.join(self.config_path, 'facerender.yaml')
 
+        print(self.mapping_checkpoint)
         print(self.free_view_checkpoint)
         self.animate_from_coeff = AnimateFromCoeff(self.free_view_checkpoint, self.mapping_checkpoint, 
                                             self.facerender_yaml_path, self.device)
@@ -117,7 +116,7 @@ class SadTalker():
         batch = get_data(first_coeff_path, audio_path, self.device, ref_eyeblink_coeff_path=None, still=still_mode) # longer audio?
         coeff_path = self.audio_to_coeff.generate(batch, save_dir, pose_style)
         #coeff2video
-        batch_size = 2
+        batch_size = 8
         data = get_facerender_data(coeff_path, crop_pic_path, first_coeff_path, audio_path, batch_size, still_mode=still_mode, preprocess=preprocess)
         return_path = self.animate_from_coeff.generate(data, save_dir,  pic_path, crop_info, enhancer='gfpgan' if use_enhancer else None, preprocess=preprocess)
         video_name = data['video_name']
